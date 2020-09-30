@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>volga_moveit</name>
+  <version>1.0.0</version>
+  <description>The volga_moveit package</description>
+
+  <maintainer email="gilles.chabert@irt-jules-verne.fr">Gilles Chabert</maintainer>
+
+  <license>Apache v2</license>
+
+  <author email="gilles.chabert@irt-jules-verne.fr">Gilles Chabert</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>volga_core</build_depend>
+  <build_depend>tf_conversions</build_depend>
+  <build_depend>moveit_core</build_depend>
+  <build_depend>moveit_ros_move_group</build_depend>
+  <build_depend>moveit_visual_tools</build_depend>
+  <build_depend>moveit_ros_planning</build_depend>
+  <build_depend>moveit_planners_ompl</build_depend> 
+  <build_depend>moveit_ros_planning_interface</build_depend>  
+ 
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>roslib</build_export_depend>
+  <build_export_depend>urdf</build_export_depend>
+  <build_export_depend>volga_core</build_export_depend>
+  <build_export_depend>tf_conversions</build_export_depend>
+  <build_export_depend>moveit_core</build_export_depend>
+  <build_export_depend>moveit_ros_move_group</build_export_depend>
+  <build_export_depend>moveit_visual_tools</build_export_depend>
+  <build_export_depend>moveit_ros_planning</build_export_depend>
+  <build_export_depend>moveit_planners_ompl</build_export_depend> 
+  <build_export_depend>moveit_ros_planning_interface</build_export_depend>  
+  
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>roslib</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>volga_core</exec_depend>
+  <exec_depend>tf_conversions</exec_depend>
+  <exec_depend>moveit_core</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_visual_tools</exec_depend>
+  <exec_depend>moveit_ros_planning</exec_depend>
+  <exec_depend>moveit_planners_ompl</exec_depend> 
+  <exec_depend>moveit_ros_planning_interface</exec_depend>   
+
+  <export>
+    <moveit_core plugin="${prefix}/volga_plugin_description.xml"/>
+  </export>
+
+</package>

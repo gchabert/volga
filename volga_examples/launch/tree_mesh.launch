@@ -1,0 +1,5 @@
+  
+<launch>
+ <node name="rviz" pkg="rviz" type="rviz" args="-d $(find volga_examples)/cfg/tree_mesh.rviz" required="true" />
+ <node name="tree_mesh" pkg="volga_examples" type="tree_mesh" />
+</launch>

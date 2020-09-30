@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<robot name="3P3R">
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+  <material name="green">
+    <color rgba="0 0.8 0 1"/>
+  </material>
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  	
+  <link name="world" />
+  
+  <link name="arm1">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+	  <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+  </link>
+  
+  <link name="arm2">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="green"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <link name="arm3">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.4" radius="0.02"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+  </link>
+    
+  <link name="wrist1" />
+  <link name="wrist2" />
+  <link name="wrist3" />
+  <link name="tool">
+     <visual>
+      <geometry>
+        <cylinder length="0.2" radius="0.01"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="red"/>
+    </visual>
+  </link>
+  <link name="tool_frame" />
+
+  <joint name="world_to_arm1" type="fixed">
+    <parent link="world"/>
+    <child link="arm1"/>
+    <origin xyz="0 0 0" rpy="0.1 -0.1 0.2"/>
+  </joint>
+  
+  <joint name="prismatic1" type="prismatic">
+    <parent link="arm1"/>
+    <child link="arm2"/>
+    <axis xyz="-1 0 0"/> 
+    <origin rpy="0 1.5707963268 0" xyz="0 0 0.2"/>
+    <limit effort="1000.0" lower="-1" upper="1" velocity="0.5"/>
+  </joint>
+  
+  <joint name="prismatic2" type="prismatic">
+    <parent link="arm2"/>
+    <child link="arm3"/>
+    <axis xyz="0 1 0"/>
+    <origin rpy="1.5707963268 0 0" xyz="0 0 0.2"/>
+    <limit effort="1000.0" lower="-1" upper="1" velocity="0.5"/>
+  </joint>
+  
+  <joint name="prismatic3" type="prismatic">
+	<parent link="arm3"/>
+    <child link="wrist1"/>
+    <axis xyz="0 0 1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <limit effort="1000.0" lower="-1" upper="1" velocity="0.5"/>
+  </joint>
+
+  <joint name="revolute1" type="continuous">
+	 <parent link="wrist1"/>
+     <child link="wrist2"/>
+     <axis xyz="0 0 1"/>
+	 <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="revolute2" type="continuous">
+	 <parent link="wrist2"/>
+     <child link="wrist3"/>
+     <axis xyz="0 0 1"/>
+     <origin rpy="-1.5707963268 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="revolute3" type="continuous">
+	 <parent link="wrist3"/>
+     <child link="tool"/>
+     <axis xyz="0 0 1"/>
+     <origin rpy="0 -1.5707963268 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="tool_to_tool_frame" type="fixed">
+	 <parent link="tool"/>
+     <child link="tool_frame"/>
+     <origin xyz="0.5 0 0"/>
+  </joint>
+
+</robot>

@@ -1,0 +1,7 @@
+<library path="libmoveit_volga_planner_plugin">
+  <class name="volga_moveit/VolgaPlanner" type="volga_moveit::VolgaPlannerManager" base_class_type="planning_interface::PlannerManager">
+    <description>
+      The Volga motion planner plugin which validates trajectories.
+    </description>
+  </class>
+</library>

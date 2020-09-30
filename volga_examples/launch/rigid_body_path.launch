@@ -1,0 +1,5 @@
+  
+<launch>
+ <node name="rviz" pkg="rviz" type="rviz" args="-d $(find volga_examples)/cfg/rigid_body_path.rviz" required="true" />
+ <node name="rigid_body_path" pkg="volga_examples" type="rigid_body_path" />
+</launch>

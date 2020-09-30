@@ -1,0 +1,28 @@
+  
+<launch>
+ <!-- either ur10 or panda -->
+ <arg name="robot" default="ur10"/> 
+ 
+ <!-- either fork or cube -->
+ <arg name="obstacle" default="fork"/>
+ 
+ <!-- either joint or cartesian -->
+ <arg name="space" default="joint"/>
+ 
+ <group if="$(eval arg('robot') =='ur10')">
+   <param name="robot_description" command="xacro '$(find volga_examples)/urdf/ur10_robot.urdf.xacro'" />
+   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find volga_examples)/cfg/kinematic_path_ur10.rviz" required="true" />
+ </group>
+
+ <group if="$(eval arg('robot') =='panda')">
+   <param name="robot_description" command="$(find xacro)/xacro '$(find franka_description)/robots/panda_arm_hand.urdf.xacro'"/>
+   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find volga_examples)/cfg/kinematic_path_panda.rviz" required="true" />
+ </group>
+
+ <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+   <param name="use_gui" value="false"/>
+   <rosparam param="source_list" subst_value="True">[/joint_command]</rosparam>
+ </node>
+ <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+ <node name="kinematic_path" args="$(arg obstacle) $(arg space)" pkg="volga_examples" type="kinematic_path" />
+</launch>
