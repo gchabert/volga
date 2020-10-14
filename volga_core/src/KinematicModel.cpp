@@ -249,9 +249,18 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			DoubleIndex idx=DoubleIndex::subcol(Dim::col_vec(7),1,6,0);
 			const ExprCtr& ctr(fk(q)[idx]=_x[idx]);
 			fac.add_ctr(ctr);
+
+			if (x[0].contains(0)) {
+				ROS_ERROR("Cannot solve inverse kinematics (to large domain for quaternion)");
+			}
+
+			const ExprCtr& ineq(x[0].lb()>0 ? fk(q)[0]>0 : fk(q)[0]<0);
+			fac.add_ctr(ineq);
+
 			ik_sys1 = new System(fac);
 			ik_solver1 = new DefaultSolver(*ik_sys1);
-			cleanup(ctr.e,true);
+
+			cleanup(Array<const ExprNode>(ctr.e,ineq.e),true);
 			delete &ctr;
 		}
 
@@ -276,6 +285,13 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			fac.add_ctr(ctr1);
 			const ExprCtr& ctr2(fkq[idx]=_x[idx]);
 			fac.add_ctr(ctr2);
+
+			if (x[1].contains(0)) {
+				ROS_ERROR("Cannot solve inverse kinematics (to large domain for quaternion)");
+			}
+
+			const ExprCtr& ineq(x[1].lb()>0 ? fk(q)[1]>0 : fk(q)[1]<0);
+			fac.add_ctr(ineq);
 
 			ik_sys2 = new System(fac);
 			ik_solver2 = new DefaultSolver(*ik_sys2);
