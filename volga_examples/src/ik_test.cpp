@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 
 	IntervalVector xgoal = robot.fk(robot.fk.tool_name).eval_vector(_q);
 
-	const CovSolverData& data=robot.fk.inverse(xgoal);
+	const CovSolverData& data=robot.ik(xgoal);
 
 	cout << "found " << data.nb_solution() << " solutions." << endl << endl;
 	for (int i =0; i<data.nb_solution(); i++) {

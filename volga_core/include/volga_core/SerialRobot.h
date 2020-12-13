@@ -105,6 +105,17 @@ public:
 	std::string get_name() const;
 
 	/**
+	 * Inverse kinematics
+	 *
+	 * \param xgoal - desired effector pose (see forward
+	 *         		  kinematic model).
+	 *
+	 * \return data - the Ibex solver structure containing
+	 *                all solutions
+	 */
+	const ibex::CovSolverData& ik(const ibex::IntervalVector& xgoal);
+
+	/**
 	 * \brief Forward kinematic model.
 	 */
 	KinematicModel fk;

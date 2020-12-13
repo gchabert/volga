@@ -162,4 +162,8 @@ string SerialRobot::get_name() const {
 	return name;
 }
 
+const ibex::CovSolverData& SerialRobot::ik(const ibex::IntervalVector& xgoal) {
+	return fk.inverse(xgoal);
+}
+
 } // end namespace volga_core
