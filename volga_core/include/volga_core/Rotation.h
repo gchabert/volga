@@ -1,6 +1,6 @@
 /*************************************************************************************
  *
- * Copyright (c) 2020, IRT Jules Verne.
+ * Copyright (c) 2020-2021, IRT Jules Verne.
  * www.irt-jules-verne.fr
  *
  * Author: Gilles Chabert
@@ -76,6 +76,11 @@ public:
 	 * \brief Build a rotation from a matrix
 	 */
 	Rotation(const ibex::ExprNode& m);
+
+	/**
+	 * \brief Create the quaternion from the rotation matrix
+	 */
+	UnitQuaternion quaternion() const;
 
 	/**
 	 * \brief Return the transformation expression

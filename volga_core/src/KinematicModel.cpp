@@ -212,7 +212,10 @@ void KinematicModel::init(const urdf::ModelInterface& model, bool use_quaternion
 		const Frame& link_frame=link_frames[it->second->name.c_str()];
 		Frame _link_frame=link_frame.copy(q,_q);
 
-		fk_links[l].init(_q, _link_frame.stack(),(string("fk_")+it->second->name).c_str());
+		// how to force conversion to quaternion at the top level:
+		//Frame _link_frame2(_link_frame.position,_link_frame.rotation.quaternion());
+
+		fk_links[l].init(_q, _link_frame.stack().simplify(1),(string("fk_")+it->second->name).c_str());
 		if (log) cout << "  Function " << fk_links[l].name << " built. (size=" << fk_links[l].expr().size << ")" << endl;
 		name2link.insert_new(it->second->name.c_str(),l);
 		link2name.push_back(it->second->name);
@@ -243,18 +246,18 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			Array<const ExprSymbol> qs(fk.args().size());
 			varcopy(fk.args(),qs);
 			const ExprSymbol& q=qs[0];
-			fac.add_var(q);
+			fac.add_var(q, joint_limits);
 
 			const ExprConstant& _x = ExprConstant::new_mutable(dx);
 			DoubleIndex idx=DoubleIndex::subcol(Dim::col_vec(7),1,6,0);
 			const ExprCtr& ctr(fk(q)[idx]=_x[idx]);
 			fac.add_ctr(ctr);
 
-			if (x[0].contains(0)) {
-				ROS_ERROR("Cannot solve inverse kinematics (to large domain for quaternion)");
+			if (x[0].is_strict_superset(Interval::zero())) {
+				ROS_ERROR("Cannot solve inverse kinematics (too large domain for quaternion)");
 			}
 
-			const ExprCtr& ineq(x[0].lb()>0 ? fk(q)[0]>0 : fk(q)[0]<0);
+			const ExprCtr& ineq(x[0].lb()>=0 ? fk(q)[0]>=0 : fk(q)[0]<=0);
 			fac.add_ctr(ineq);
 
 			ik_sys1 = new System(fac);
@@ -264,7 +267,7 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			delete &ctr;
 		}
 
-		ik_solver1->solve(joint_limits);
+		ik_solver1->solve(joint_limits,true);
 		return ik_solver1->get_data();
 
 	} else {
@@ -275,7 +278,7 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 
 			varcopy(fk.args(),qs);
 			const ExprSymbol& q=qs[0];
-			fac.add_var(q);
+			fac.add_var(q, joint_limits);
 
 			const ExprConstant& _x = ExprConstant::new_mutable(dx);
 			const ExprNode& fkq=fk(q);
@@ -286,11 +289,11 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			const ExprCtr& ctr2(fkq[idx]=_x[idx]);
 			fac.add_ctr(ctr2);
 
-			if (x[1].contains(0)) {
-				ROS_ERROR("Cannot solve inverse kinematics (to large domain for quaternion)");
+			if (x[1].is_strict_superset(Interval::zero())) {
+				ROS_ERROR("Cannot solve inverse kinematics (too large domain for quaternion)");
 			}
 
-			const ExprCtr& ineq(x[1].lb()>0 ? fk(q)[1]>0 : fk(q)[1]<0);
+			const ExprCtr& ineq(x[1].lb()>=0 ? fk(q)[1]>=0 : fk(q)[1]<=0);
 			fac.add_ctr(ineq);
 
 			ik_sys2 = new System(fac);
@@ -300,7 +303,7 @@ const ibex::CovSolverData& KinematicModel::inverse(const ibex::IntervalVector& x
 			delete &ctr2;
 		}
 
-		ik_solver2->solve(joint_limits);
+		ik_solver2->solve(joint_limits,true);
 		return ik_solver2->get_data();
 	}
 }

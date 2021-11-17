@@ -1,6 +1,6 @@
 /*************************************************************************************
  *
- * Copyright (c) 2020, IRT Jules Verne.
+ * Copyright (c) 2020-2021, IRT Jules Verne.
  * www.irt-jules-verne.fr
  *
  * Author: Gilles Chabert
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
 
 	double epsilon = 0.03; // collision threshold
 
-	bool use_quaternions = false;
+	bool use_quaternions = true;
 
 	volga_core::SerialRobot robot(urdf_param, epsilon, true, use_quaternions, true);
 

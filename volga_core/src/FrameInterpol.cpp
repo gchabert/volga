@@ -150,7 +150,7 @@ FrameInterpol::FrameInterpol() :
 
 		UnitQuaternion qt(q0 + t*(q1-q0), true); // "true" = normalization
 
-		const ExprNode& xqt = ExprVector::new_col(Array<const ExprNode>(qt.x(),qt.y(),qt.z(),qt.w(),xt));
+		const ExprNode& xqt = qt.stack_with(xt);
 
 		lerp.init(t, xqt, "lerp");
 	}
@@ -197,7 +197,7 @@ FrameInterpol::FrameInterpol() :
 
 		UnitQuaternion qt((s1 * q0) + (s2 * q1), false);
 
-		const ExprNode& xqt = ExprVector::new_col(Array<const ExprNode>(qt.x(),qt.y(),qt.z(),qt.w(),xt));
+		const ExprNode& xqt = qt.stack_with(xt);
 
 		slerp.init(t, xqt, "slerp");
 	}

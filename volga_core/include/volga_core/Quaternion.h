@@ -1,6 +1,6 @@
 /*************************************************************************************
  *
- * Copyright (c) 2020, IRT Jules Verne.
+ * Copyright (c) 2020-2021, IRT Jules Verne.
  * www.irt-jules-verne.fr
  *
  * Author: Gilles Chabert
@@ -31,6 +31,8 @@
 
 namespace volga_core {
 
+class UnitQuaternion;
+
 /**
  * \brief Ibex expression representing a quaternion.
  */
@@ -43,11 +45,33 @@ public:
 	Quaternion(const ibex::ExprNode& x, const ibex::ExprNode& y, const ibex::ExprNode& z, const ibex::ExprNode& w);
 
 	/**
+	 * \brief Create the constant quaternion q.
+	 */
+	Quaternion(const ibex::IntervalVector& q);
+
+	/**
+	 * \brief Create the constant quaternion q=(x,y,z,w).
+	 */
+	Quaternion(const ibex::Interval& x, const ibex::Interval& y, const ibex::Interval& z, const ibex::Interval& w);
+
+	/**
 	 * \brief Copy a quaternion.
 	 *
 	 * \warning shallow copy: x, y and z transmitted by reference.
 	 */
 	Quaternion(const Quaternion& q);
+
+	/**
+	 * \brief Normalize this.
+	 */
+	UnitQuaternion normalize() const;
+
+	/**
+	 * \brief Add all the nodes (for cleanup)
+	 */
+	void add_nodes(std::vector<const ibex::ExprNode*>& nodes) const;
+
+protected:
 
 	/**
 	 * \brief x component by reference.
@@ -74,26 +98,53 @@ public:
 	 */
 	Quaternion conjugate() const;
 
-protected:
+	friend Quaternion operator+(const Quaternion& q1, const Quaternion& q2);
+	friend Quaternion operator-(const Quaternion& q1, const Quaternion& q2);
+	friend Quaternion operator*(const Quaternion& q1, const Quaternion& q2);
+	friend Quaternion operator*(const ibex::ExprNode& x, const Quaternion& q);
+	friend Quaternion operator*(const ibex::Interval& x, const Quaternion& q);
+	friend std::ostream& operator<<(std::ostream& os, const Quaternion& q);
+
+	/**
+	 * True if this quaternion is constant
+	 */
+	bool constant() const;
+
 	/**
 	 * \brief x
+	 *
+	 * Null if constant quaternion
 	 */
 	const ibex::ExprNode* _x;
 
 	/**
 	 * \brief y
+	 *
+	 * Null if constant quaternion
 	 */
 	const ibex::ExprNode* _y;
 
 	/**
 	 * \brief z
+	 *
+	 * Null if constant quaternion
 	 */
 	const ibex::ExprNode* _z;
 
 	/**
 	 * \brief w
+	 *
+	 * Null if constant quaternion
 	 */
 	const ibex::ExprNode* _w;
+
+
+	/**
+	 * \brief The quaternion, if constant
+	 *
+	 * Unused if non-constant quaternion
+	 */
+	const ibex::IntervalVector c;
 
 	/**
 	 * \brief Multiply *this by [0,x].
@@ -125,16 +176,17 @@ Quaternion operator*(const Quaternion& q1, const Quaternion& q2);
 Quaternion operator*(const ibex::ExprNode& x, const Quaternion& q);
 
 /**
+ * \brief Left multiplication by a scalar
+ */
+Quaternion operator*(const ibex::Interval& x, const Quaternion& q);
+
+/**
  * \brief Display a quaternion.
  */
 std::ostream& operator<<(std::ostream& os, const Quaternion& q);
 
 
 /*============================================ inline implementation ============================================ */
-
-inline Quaternion::Quaternion(const Quaternion& q) : _x(&q.x()), _y(&q.y()), _z(&q.z()), _w(&q.w()) {
-
-}
 
 inline const ibex::ExprNode& Quaternion::x() const {
 	return *_x;
@@ -153,7 +205,7 @@ inline const ibex::ExprNode& Quaternion::w() const {
 }
 
 inline Quaternion Quaternion::conjugate() const {
-	return Quaternion(-x(), -y(), -z(), w());
+	return constant() ? Quaternion(-x(), -y(), -z(), w()) : Quaternion(-c[0], -c[1], -c[2], c[3]);
 }
 
 } /* namespace volga_core */

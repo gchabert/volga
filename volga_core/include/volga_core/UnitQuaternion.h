@@ -1,6 +1,6 @@
 /*************************************************************************************
  *
- * Copyright (c) 2020, IRT Jules Verne.
+ * Copyright (c) 2020-2021, IRT Jules Verne.
  * www.irt-jules-verne.fr
  *
  * Author: Gilles Chabert
@@ -28,6 +28,9 @@
 
 #include "Quaternion.h"
 
+#include <urdf_model/pose.h>
+#include <ibex_ExprCopy.h>
+
 namespace volga_core {
 
 /**
@@ -51,6 +54,22 @@ public:
 	UnitQuaternion(const ibex::ExprNode& x, const ibex::ExprNode& y, const ibex::ExprNode& z, const ibex::ExprNode& w, bool normalize);
 
 	/**
+	 * \brief Build a constant unit quaternion.
+	 *
+	 * \param normalize - if true, the quaternion is normalized. If false, (x,y,z,w) is
+	 * 			          assumed to be already normalized.
+	 */
+	UnitQuaternion(const ibex::Interval& x, const ibex::Interval& y, const ibex::Interval& z, const ibex::Interval& w, bool normalize);
+
+	/**
+	 * \brief Build a constant unit quaternion.
+	 *
+	 * \param normalize - if true, the quaternion is normalized. If false, (x,y,z,w) is
+	 * 			          assumed to be already normalized.
+	 */
+	UnitQuaternion(const ibex::IntervalVector& x, bool normalize);
+
+	/**
 	 * \brief Copy and (optionally) normalize a unit quaternion.
 	 *
 	 * \param q         - quaternion to copy (nodes are not copied)
@@ -58,6 +77,11 @@ public:
 	 * 			          assumed to be already normalized.
 	 */
 	UnitQuaternion(const Quaternion& q, bool normalize);
+
+	/**
+	 * \brief Copy a unit quaternion.
+	 */
+	UnitQuaternion(const UnitQuaternion& q);
 
 	/**
 	 *  \brief Identity quaternion
@@ -82,17 +106,32 @@ public:
 	 */
 	const ibex::ExprNode& rotate(const ibex::ExprNode& x) const;
 
+	/**
+	 * \brief Rotation by a unit quaternion.
+	 *
+	 * Rotate a vector \a x by the rotation that
+	 * this quaternion represents.
+	 */
+	const ibex::ExprNode& rotate(const urdf::Vector3& x) const;
+
+	/**
+	 * \brief Copy expressions
+	 */
+	UnitQuaternion copy(ibex::ExprCopy& c, const ibex::Array<const ibex::ExprSymbol>& old_x, const ibex::Array<const ibex::ExprSymbol>& new_x, bool shared=false) const;
+
+	/**
+	 * \brief Return the expression node quaternion+translation
+	 *
+	 * The returned expression is a 7x1 vector.
+	 */
+	const ibex::ExprNode& stack_with(const ibex::ExprNode& translation) const;
+
 protected:
 
 	/*
 	 * Copy
 	 */
 	explicit UnitQuaternion(const Quaternion& q);
-
-	/*
-	 * Normalization
-	 */
-	static Quaternion normalize(const ibex::ExprNode& x, const ibex::ExprNode& y, const ibex::ExprNode& z, const ibex::ExprNode& w);
 };
 
 } /* namespace volga_core */

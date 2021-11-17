@@ -1,6 +1,6 @@
 /*************************************************************************************
  *
- * Copyright (c) 2020, IRT Jules Verne.
+ * Copyright (c) 2020-2021, IRT Jules Verne.
  * www.irt-jules-verne.fr
  *
  * Author: Gilles Chabert
@@ -50,9 +50,12 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "ik_test");
 
 	std::string urdf_path = ros::package::getPath(_PACKAGE_NAME);
-	std::string urdf_filename = urdf_path + "/urdf/robot3p3r.urdf";
+	//std::string urdf_filename = urdf_path + "/urdf/robot3p3r.urdf";
+	std::string urdf_filename = urdf_path + "/urdf/iiwa-6joints.urdf";
 
-	volga_core::SerialRobot robot(urdf_filename, 0.1, false, true, true);
+	bool use_quaternion = true;
+	bool log = true;
+	volga_core::SerialRobot robot(urdf_filename, 0.1, false, use_quaternion, log);
 
 	Vector _q(robot.fk.nb_actuated,0.12);
 

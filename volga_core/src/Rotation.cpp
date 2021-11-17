@@ -145,14 +145,21 @@ Rotation::Rotation(const urdf::Rotation& r, bool use_quaternions) {
 		matrix = NULL;
 		double x,y,z,w;
 		r.getQuaternion(x,y,z,w);
-		q = new UnitQuaternion(
-				ExprConstant::new_scalar(x),
-				ExprConstant::new_scalar(y),
-				ExprConstant::new_scalar(z),
-				ExprConstant::new_scalar(w),false);
+		q = new UnitQuaternion(x,y,z,w,false);
 	} else {
 		matrix = &get_cst_rotmatrix(r);
 		q = NULL;
+	}
+}
+
+UnitQuaternion Rotation::quaternion() const {
+	if (q) return *q;
+	else {
+		const ExprNode& w=0.5*sqrt(1+(*matrix)[0][0]+(*matrix)[1][1]+(*matrix)[2][2]);
+		const ExprNode& x=((*matrix)[2][1]-(*matrix)[1][2])/(4*w);
+		const ExprNode& y=((*matrix)[0][2]-(*matrix)[2][0])/(4*w);
+		const ExprNode& z=((*matrix)[1][0]-(*matrix)[0][1])/(4*w);
+		return UnitQuaternion(x,y,z,w,false);
 	}
 }
 
@@ -168,24 +175,15 @@ Rotation::~Rotation() {
 }
 
 void Rotation::add_nodes(vector<const ExprNode*>& nodes) const {
-	if (q) {
-		nodes.push_back(&q->x());
-		nodes.push_back(&q->y());
-		nodes.push_back(&q->z());
-		nodes.push_back(&q->w());
-	} else
+	if (q)
+		q->add_nodes(nodes);
+	else
 		nodes.push_back(matrix);
 }
 
 const ExprNode& Rotation::stack_with(const ExprNode& translation) const {
 	if (q)
-		return ExprVector::new_col(
-				Array<const ExprNode>(
-						q->x(),
-						q->y(),
-						q->z(),
-						q->w(),
-						translation));
+		return q->stack_with(translation);
 	else
 		return ExprVector::new_row(*matrix, translation);
 }
@@ -218,19 +216,15 @@ const ExprNode& Rotation::operator*(const ExprNode& x) const {
 }
 
 const ExprNode& Rotation::operator*(const urdf::Vector3& x) const {
-	return (*this) * get_cst_vector(x);
+	if (q) return q->rotate(x);
+	else return (*this) * get_cst_vector(x);
 }
 
 Rotation Rotation::copy(ExprCopy& c, const Array<const ExprSymbol>& old_args, const Array<const ExprSymbol>& new_args, bool shared) const {
-	if (q) {
-		const ExprNode& x=c.copy(old_args, new_args, q->x(), shared);
-		const ExprNode& y=c.copy(old_args, new_args, q->y(), shared);
-		const ExprNode& z=c.copy(old_args, new_args, q->z(), shared);
-		const ExprNode& w=c.copy(old_args, new_args, q->w(), shared);
-		return UnitQuaternion(x,y,z,w,false);
-	} else {
+	if (q)
+		return q->copy(c, old_args, new_args, shared);
+	else
 		return c.copy(old_args, new_args, *matrix, shared);
-	}
 }
 
 std::ostream& operator<<(std::ostream& os, const Rotation& r) {
